@@ -3,7 +3,7 @@ import { createAccount } from "../crypto";
 import { lessonById } from "../curriculum";
 import { applyBlock, buildTx, CONTRACT, namedAccounts, type Tx } from "../ledger";
 import { getState, markCheck, saveAccount, saveLedger, useStore } from "../store";
-import { Choice, Fields, LessonFrame, Result } from "../ui";
+import { Choice, Fields, LessonFrame, Result, downloadText } from "../ui";
 
 export function ContractLesson() {
   const lesson = lessonById("contract");
@@ -98,6 +98,28 @@ export function ContractLesson() {
           } else setNote("对比两笔交易的 data。");
         }}
       />
+      <button
+        type="button"
+        className="ghost"
+        onClick={() =>
+          downloadText(
+            "storage.json",
+            JSON.stringify(
+              {
+                contract: CONTRACT,
+                storage: store.ledger.storage,
+                lastData: last?.tx?.data ?? null,
+                note: "状态在 storage。没有字节码，没有 gas 市场，没有真实 EVM。",
+              },
+              null,
+              2,
+            ),
+            "application/json",
+          )
+        }
+      >
+        下载存储快照
+      </button>
       {note ? <p>{note}</p> : null}
     </LessonFrame>
   );

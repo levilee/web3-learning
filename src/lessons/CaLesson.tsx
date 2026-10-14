@@ -4,10 +4,12 @@ import { lessonById } from "../curriculum";
 import { markCheck } from "../store";
 import { Fields, LessonFrame, Result, downloadText } from "../ui";
 
+type Verdict = { ok: boolean; reason: string };
+
 type Outcomes = {
-  ok?: string;
-  wrong?: string;
-  revoked?: string;
+  ok?: Verdict;
+  wrong?: Verdict;
+  revoked?: Verdict;
 };
 
 export function CaLesson() {
@@ -76,11 +78,11 @@ export function CaLesson() {
       {error ? <Result ok={false} text={error} /> : null}
       {material ? (
         <div className="row">
-          <button
+            <button
             type="button"
             onClick={() => {
-              void verifyLeaf(material.leafPem, material.caPem, []).then((result) => {
-                setOutcomes((current) => ({ ...current, ok: result.reason }));
+              void verifyLeaf(material.leafPem, material.caPem, revoked).then((result) => {
+                setOutcomes((current) => ({ ...current, ok: result }));
                 if (result.ok) markCheck("ca", "verifyOk");
               });
             }}
@@ -91,8 +93,8 @@ export function CaLesson() {
             type="button"
             onClick={() => {
               void verifyLeaf(material.leafPem, material.otherCaPem, []).then((result) => {
-                setOutcomes((current) => ({ ...current, wrong: result.reason }));
-                if (!result.ok) markCheck("ca", "wrongCa");
+                setOutcomes((current) => ({ ...current, wrong: result }));
+                if (!result.ok && result.reason.includes("签名")) markCheck("ca", "wrongCa");
               });
             }}
           >
@@ -104,18 +106,23 @@ export function CaLesson() {
               const next = Array.from(new Set([...revoked, material.leafSerial]));
               setRevoked(next);
               void verifyLeaf(material.leafPem, material.caPem, next).then((result) => {
-                setOutcomes((current) => ({ ...current, revoked: result.reason }));
-                if (!result.ok) markCheck("ca", "revoked");
+                setOutcomes((current) => ({ ...current, revoked: result }));
+                if (!result.ok && result.reason.includes("吊销")) markCheck("ca", "revoked");
               });
             }}
           >
             把序列号放进教学吊销名单
           </button>
+          {revoked.length > 0 ? (
+            <button type="button" className="ghost" onClick={() => setRevoked([])}>
+              从教学吊销名单移出
+            </button>
+          ) : null}
         </div>
       ) : null}
-      {outcomes.ok ? <Result ok text={outcomes.ok} /> : null}
-      {outcomes.wrong ? <Result ok={false} text={outcomes.wrong} /> : null}
-      {outcomes.revoked ? <Result ok={false} text={outcomes.revoked} /> : null}
+      {outcomes.ok ? <Result ok={outcomes.ok.ok} text={outcomes.ok.reason} /> : null}
+      {outcomes.wrong ? <Result ok={outcomes.wrong.ok} text={outcomes.wrong.reason} /> : null}
+      {outcomes.revoked ? <Result ok={outcomes.revoked.ok} testId="revoke-result" text={outcomes.revoked.reason} /> : null}
       <p className="bridge">证书的 issuer 是目录里的 CA。持有者不能只把其中一项声明单独拿出来。第 7 课从这里接上。</p>
     </LessonFrame>
   );

@@ -66,7 +66,7 @@ export function Home() {
           const done = passed(lesson, store.progress[lesson.id]);
           return (
             <li key={lesson.id}>
-              <a href={lesson.path}>
+              <a href={lesson.path} data-testid={`path-${lesson.id}`} data-status={done ? "已通过" : "未开始"}>
                 <span className="num">{lesson.number}</span>
                 <span>
                   <strong>{lesson.title}</strong>
@@ -79,6 +79,7 @@ export function Home() {
           );
         })}
       </ol>
+      <p className="scope">不在这条路径里：节点运维、共识与最终性、代币授权、DeFi、跨链。</p>
       <button
         type="button"
         className="ghost danger"
@@ -118,9 +119,9 @@ export function LessonFrame({
         <Status done={done} />
       </div>
       <p className="model">{lesson.model}</p>
-      {lesson.kind === "sim" ? (
-        <p className="sim-note">模拟账本。没有测试网，没有共识，没有真 EVM。签名本身仍由浏览器计算。</p>
-      ) : null}
+      <p className={lesson.kind === "sim" ? "sim-note" : "honesty"} data-testid="honesty">
+        {lesson.honesty}
+      </p>
       <div className="work">
         <section className="lab">{children}</section>
         <aside className="inspector">
@@ -132,7 +133,7 @@ export function LessonFrame({
         <h2>通过条件</h2>
         <ul>
           {lesson.checks.map((check) => (
-            <li key={check.id} className={checks?.[check.id] ? "on" : ""}>
+            <li key={check.id} className={checks?.[check.id] ? "on" : ""} data-check={check.id} data-done={checks?.[check.id] ? "yes" : "no"}>
               {check.label}
             </li>
           ))}
@@ -165,8 +166,12 @@ export function Fields({ rows }: { rows: { name: string; value: string; note?: s
   );
 }
 
-export function Result({ ok, text }: { ok: boolean; text: string }) {
-  return <p className={ok ? "result ok" : "result bad"}>{text}</p>;
+export function Result({ ok, text, testId }: { ok: boolean; text: string; testId?: string }) {
+  return (
+    <p className={ok ? "result ok" : "result bad"} data-testid={testId}>
+      {text}
+    </p>
+  );
 }
 
 export function Choice({

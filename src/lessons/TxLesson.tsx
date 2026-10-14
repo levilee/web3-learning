@@ -1,30 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createAccount } from "../crypto";
 import { lessonById } from "../curriculum";
 import { applyBlock, buildTx, namedAccounts, type Tx } from "../ledger";
 import { getState, markCheck, saveAccount, saveLedger, useStore } from "../store";
-import { Fields, LessonFrame, Result } from "../ui";
+import { Fields, LessonFrame, Result, downloadText } from "../ui";
 
 export function TxLesson() {
   const lesson = lessonById("tx");
   const store = useStore();
   const { bob } = namedAccounts();
+  const [to, setTo] = useState(bob.address);
   const [value, setValue] = useState(1);
+  const [data, setData] = useState("");
+  const [nonceInput, setNonceInput] = useState(0);
   const [last, setLast] = useState<{ ok: boolean; text: string; tx?: Tx } | null>(null);
   const account = store.account;
   const balance = account ? (store.ledger.accounts[account.address]?.balance ?? 0) : 0;
   const nonce = account ? (store.ledger.accounts[account.address]?.nonce ?? 0) : 0;
 
+  useEffect(() => {
+    setNonceInput(nonce);
+  }, [nonce]);
+
   function submit(kind: "ok" | "nonce" | "balance") {
     const signer = account ?? createAccount();
     if (!account) saveAccount(signer);
     const ledger = getState().ledger;
-    const current = ledger.accounts[signer.address];
+    const current = ledger.accounts[signer.address] ?? { balance: 0, nonce: 0 };
     const tx = buildTx(ledger, signer, {
-      to: bob.address,
-      value: kind === "balance" ? current.balance + 10 : Math.max(1, value),
-      data: "",
-      nonce: kind === "nonce" ? current.nonce + 3 : current.nonce,
+      to,
+      value: kind === "balance" ? current.balance + 10 : Math.max(0, value),
+      data,
+      nonce: kind === "nonce" ? current.nonce + 3 : kind === "ok" ? nonceInput : current.nonce,
     });
     const applied = applyBlock(ledger, [tx]);
     if (applied.ok) {
@@ -34,8 +41,8 @@ export function TxLesson() {
       return;
     }
     setLast({ ok: false, text: applied.reason, tx });
-    if (kind === "nonce") markCheck("tx", "badNonce");
-    if (kind === "balance") markCheck("tx", "lowBalance");
+    if (applied.reason.includes("nonce 不正确")) markCheck("tx", "badNonce");
+    if (applied.reason.includes("余额不足")) markCheck("tx", "lowBalance");
   }
 
   return (
@@ -75,8 +82,24 @@ export function TxLesson() {
         <p>还没有账户。提交时会生成第 3 课同一把密钥。</p>
       )}
       <label>
+        from
+        <input value={account?.address ?? "提交时使用第 3 课的密钥"} readOnly />
+      </label>
+      <label>
+        to
+        <input value={to} onChange={(event) => setTo(event.target.value.trim())} spellCheck={false} />
+      </label>
+      <label>
         value
-        <input type="number" min={1} value={value} onChange={(event) => setValue(Number(event.target.value))} />
+        <input type="number" min={0} value={value} onChange={(event) => setValue(Number(event.target.value))} />
+      </label>
+      <label>
+        nonce
+        <input type="number" min={0} value={nonceInput} onChange={(event) => setNonceInput(Number(event.target.value))} />
+      </label>
+      <label>
+        data
+        <input value={data} onChange={(event) => setData(event.target.value)} placeholder="普通转账留空" />
       </label>
       <div className="row">
         <button type="button" onClick={() => submit("ok")}>
@@ -89,7 +112,16 @@ export function TxLesson() {
           提交超额转账
         </button>
       </div>
-      {last ? <Result ok={last.ok} text={last.text} /> : null}
+      {last ? <Result ok={last.ok} testId="tx-result" text={last.text} /> : null}
+      {last?.tx ? (
+        <button
+          type="button"
+          className="ghost"
+          onClick={() => downloadText("transaction.json", JSON.stringify(last.tx, null, 2), "application/json")}
+        >
+          下载这笔交易
+        </button>
+      ) : null}
     </LessonFrame>
   );
 }

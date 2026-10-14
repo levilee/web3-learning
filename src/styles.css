@@ -14,7 +14,7 @@
   --bad: #8d2c2c;
   --bad-bg: #f8e7e4;
   --shadow: 0 16px 40px rgba(60, 42, 20, 0.08);
-  font-family: "Avenir Next", "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif;
+  font-family: "WenQuanYi Micro Hei", "Droid Sans Fallback", "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -84,7 +84,7 @@ h1 { font-size: clamp(36px, 5vw, 64px); line-height: 0.95; margin: 8px 0 16px; l
 
 .lede, .model { font-size: 18px; line-height: 1.6; max-width: 68ch; }
 
-.legend, .progress-line, .sim-note, .bridge { color: var(--muted); }
+.legend, .progress-line, .sim-note, .bridge, .honesty, .scope { color: var(--muted); }
 
 .legend { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 24px 0; }
 
@@ -122,10 +122,12 @@ h1 { font-size: clamp(36px, 5vw, 64px); line-height: 0.95; margin: 8px 0 16px; l
 .lesson-title { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .lesson-title h1 { flex-basis: 100%; }
 
-.sim-note, .bridge {
+.sim-note, .honesty, .bridge {
   border-left: 3px solid var(--sim);
   padding-left: 12px;
 }
+
+.honesty { border-left-color: var(--real); }
 
 .bridge { border-left-color: var(--real); }
 
@@ -163,7 +165,7 @@ button:disabled { opacity: 0.45; }
 button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 button.danger { color: var(--bad); }
 
-.mono, .fields dd { font-family: "IBM Plex Mono", "ui-monospace", "SFMono-Regular", Menlo, Consolas, monospace; word-break: break-all; }
+.mono, .fields dd { font-family: "WenQuanYi Micro Hei Mono", ui-monospace, Menlo, Consolas, monospace; word-break: break-all; }
 
 .fields { margin: 0; display: grid; gap: 12px; }
 .fields div { display: grid; gap: 4px; }

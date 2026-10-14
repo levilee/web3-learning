@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { addressFromPublicKey, createAccount } from "../crypto";
+import { createAccount, publicKeyDigest } from "../crypto";
 import { lessonById } from "../curriculum";
 import { markCheck, saveAccount, useStore } from "../store";
-import { Choice, Fields, LessonFrame } from "../ui";
+import { Choice, Fields, LessonFrame, downloadText } from "../ui";
 import { hexToBytes } from "@noble/hashes/utils.js";
 
 export function AddressLesson() {
@@ -10,7 +10,7 @@ export function AddressLesson() {
   const store = useStore();
   const account = store.account;
   const [note, setNote] = useState("");
-  const derived = account ? addressFromPublicKey(hexToBytes(account.publicKeyHex)) : "";
+  const parts = account ? publicKeyDigest(hexToBytes(account.publicKeyHex)) : null;
 
   return (
     <LessonFrame
@@ -21,8 +21,9 @@ export function AddressLesson() {
             account
               ? [
                   { name: "public key", value: account.publicKeyHex },
-                  { name: "keccak256 → address", value: derived },
-                  { name: "issuer", value: "(没有)", note: "地址不是证书 subject" },
+                  { name: "keccak256", value: parts?.digestHex ?? "" },
+                  { name: "address", value: parts?.address ?? "", note: "摘要的末 20 字节" },
+                  { name: "issuer", value: "无", note: "地址不是证书 subject" },
                 ]
               : []
           }
@@ -33,8 +34,10 @@ export function AddressLesson() {
       <button
         type="button"
         onClick={() => {
-          if (!account) saveAccount(createAccount());
-          markCheck("address", "derived");
+          const next = account ?? createAccount();
+          if (!account) saveAccount(next);
+          const check = publicKeyDigest(hexToBytes(next.publicKeyHex));
+          if (check.address === next.address) markCheck("address", "derived");
         }}
       >
         {account ? "这把密钥已经推导出地址" : "生成密钥并推导地址"}
@@ -53,10 +56,34 @@ export function AddressLesson() {
               markCheck("address", "noIssuer");
               setNote("对。这张身份没有 issuer。第 5 课会用同一把密钥当账户。");
             } else {
-              setNote("字段检查器里的 issuer 是空的。地址来自公钥摘要。");
+              setNote("字段检查器里的 issuer 是无。地址来自公钥摘要。");
             }
           }}
         />
+      ) : null}
+      {account && parts ? (
+        <button
+          type="button"
+          className="ghost"
+          onClick={() =>
+            downloadText(
+              "address.json",
+              JSON.stringify(
+                {
+                  publicKey: account.publicKeyHex,
+                  keccak256: parts.digestHex,
+                  address: parts.address,
+                  issuer: null,
+                },
+                null,
+                2,
+              ),
+              "application/json",
+            )
+          }
+        >
+          下载地址推导
+        </button>
       ) : null}
       {note ? <p>{note}</p> : null}
     </LessonFrame>

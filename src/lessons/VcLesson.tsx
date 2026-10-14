@@ -57,9 +57,9 @@ export function VcLesson() {
     setPresentation(vp);
     setResult({ ok: verdict.ok, text: verdict.reason });
     if (kind === "valid" && verdict.ok) markCheck("vc", "valid");
-    if (kind === "expired" && !verdict.ok) markCheck("vc", "expired");
-    if (kind === "missing" && !verdict.ok) markCheck("vc", "missing");
-    if (kind === "revoked" && !verdict.ok) markCheck("vc", "revoked");
+    if (kind === "expired" && verdict.reason.includes("有效期")) markCheck("vc", "expired");
+    if (kind === "missing" && verdict.reason.includes("role")) markCheck("vc", "missing");
+    if (kind === "revoked" && verdict.reason.includes("状态名单")) markCheck("vc", "revoked");
   }
 
   const credential = presentation?.verifiableCredential[0];

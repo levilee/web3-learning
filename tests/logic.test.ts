@@ -14,6 +14,8 @@ import {
   verifyMessage,
   verifyPresentation,
   verifyProof,
+  sha256Of,
+  explainTamper,
 } from "../src/crypto.ts";
 import { issueLabCerts, verifyLeaf } from "../src/cert.ts";
 import {
@@ -25,7 +27,7 @@ import {
   namedAccounts,
   verifyTx,
 } from "../src/ledger.ts";
-import { hexToBytes } from "@noble/hashes/utils.js";
+import { hexToBytes, utf8ToBytes } from "@noble/hashes/utils.js";
 
 const original = "运维交接：证书在 4 月 2 日到期";
 const changed = flipLastCharacter(original);
@@ -35,6 +37,13 @@ const account = createAccount();
 const signature = signMessage(original, account.secretKeyHex);
 assert.equal(verifyMessage(original, signature, account.publicKeyHex), true);
 assert.equal(verifyMessage(changed, signature, account.publicKeyHex), false);
+assert.equal(explainTamper(original, changed, signature, account.publicKeyHex).reason, "消息已改变");
+{
+  const raw = utf8ToBytes(original);
+  const flipped = new Uint8Array(raw);
+  flipped[flipped.length - 1] ^= 0x01;
+  assert.notEqual(sha256Of(raw), sha256Of(flipped));
+}
 assert.equal(addressFromPublicKey(hexToBytes(account.publicKeyHex)), account.address);
 assert.match(account.address, /^0x[0-9a-f]{40}$/);
 

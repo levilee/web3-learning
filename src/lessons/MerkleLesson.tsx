@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { prove, verifyProof } from "../crypto";
 import { lessonById } from "../curriculum";
 import { markCheck, useStore } from "../store";
-import { Fields, LessonFrame, Result } from "../ui";
+import { Fields, LessonFrame, Result, downloadText } from "../ui";
 
 export function MerkleLesson() {
   const lesson = lessonById("merkle");
@@ -104,18 +104,60 @@ export function MerkleLesson() {
           }}
         />
       </label>
-      <button
-        type="button"
-        onClick={() => {
-          if (!proof) return;
-          const leaf = edited || selectedLeaf;
-          const ok = verifyProof(leaf, proof.proof, proof.root);
-          setTamperOk(ok);
-          if (!ok && leaf !== selectedLeaf) markCheck("merkle", "tamperFail");
-        }}
-      >
-        用改过的叶子验证
-      </button>
+      <div className="row">
+        <button
+          type="button"
+          onClick={() => {
+            if (!proof) return;
+            const leaf = `${selectedLeaf}x`;
+            setEdited(leaf);
+            const ok = verifyProof(leaf, proof.proof, proof.root);
+            setTamperOk(ok);
+            if (!ok) markCheck("merkle", "tamperFail");
+          }}
+        >
+          改掉叶子后再验证
+        </button>
+        <button
+          type="button"
+          className="ghost"
+          onClick={() => {
+            if (!proof) return;
+            const leaf = edited || selectedLeaf;
+            const ok = verifyProof(leaf, proof.proof, proof.root);
+            setTamperOk(ok);
+            if (!ok && leaf !== selectedLeaf) markCheck("merkle", "tamperFail");
+          }}
+        >
+          用改过的叶子验证
+        </button>
+        {proof ? (
+          <button
+            type="button"
+            className="ghost"
+            onClick={() =>
+              downloadText(
+                "merkle-proof.json",
+                JSON.stringify(
+                  {
+                    block: block?.index ?? 0,
+                    leaf: selectedLeaf,
+                    leafHash: proof.leafHash,
+                    root: proof.root,
+                    proof: proof.proof,
+                    label: "模拟账本：没有测试网，没有共识",
+                  },
+                  null,
+                  2,
+                ),
+                "application/json",
+              )
+            }
+          >
+            下载包含证明
+          </button>
+        ) : null}
+      </div>
       {tamperOk !== null ? (
         <Result ok={tamperOk} text={tamperOk ? "改过之后仍然通过。先改掉叶子里的一个字符。" : "同一份证明失败。根还是原来的根。"} />
       ) : null}
