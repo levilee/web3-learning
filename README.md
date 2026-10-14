@@ -6,7 +6,7 @@
 
 不在这条路径里：节点运维、共识与最终性、代币授权、DeFi、跨链、账号和后端。
 
-公网地址：<https://levilee.github.io/web3-learning/>
+站点文件在 `gh-pages` 分支。仓库的 Settings → Pages 里把来源选成 `gh-pages` 分支、目录 `/ (root)` 之后，公网地址是 <https://levilee.github.io/web3-learning/>。之后推到 `main`，GitHub Actions 会更新这个地址。
 
 本地开发：
 
