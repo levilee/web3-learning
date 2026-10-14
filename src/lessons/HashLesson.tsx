@@ -3,7 +3,7 @@ import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils.js";
 import { createAccount, explainTamper, flipLastCharacter, sha256Of, signMessage, verifyMessage } from "../crypto";
 import { lessonById } from "../curriculum";
 import { markCheck } from "../store";
-import { AlgorithmAtlas, SignPipeline, Sources } from "../diagrams";
+import { AlgorithmAtlas, ByteFlip, SignPipeline, Sources } from "../diagrams";
 import { Fields, LessonFrame, Result, downloadText } from "../ui";
 
 type ByteDemo = {
@@ -109,7 +109,7 @@ export function HashLesson() {
           compareMessage={tamper?.message}
         />
       ) : null}
-      {bytes && bytes.beforeHash !== bytes.afterHash ? <Result ok text="哈希变了。改动的是最后一个字节，SHA-256 的 32 字节摘要跟着全变。" /> : null}
+      {bytes && bytes.beforeHash !== bytes.afterHash ? <ByteFlip before={bytes.beforeHex} after={bytes.afterHex} /> : null}
       {tamper ? <Result ok={false} testId="verify-reason" text={`验证失败：${tamper.reason}`} /> : null}
       {signed ? (
         <button

@@ -217,8 +217,22 @@ button.danger { color: var(--bad); }
 .trace li.pass { border-color: var(--ok); }
 .trace li.fail { border-color: var(--bad); background: var(--bad-bg); }
 .trace strong { font-size: 14px; }
-.sources { color: var(--muted); font-size: 13px; line-height: 1.5; }
-.sources a { color: var(--real); }
+.pipeline-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.pipeline-head h2 { margin: 0; }
+.caption { min-height: 3em; font-size: 16px; }
+.hidden-step { opacity: 0.28; }
+.shown { animation: rise 0.45s ease; }
+.march { stroke-dasharray: 6 5; animation: march 0.45s linear infinite; }
+.byteflip { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.byteflip code { padding: 2px 6px; border-radius: 6px; background: #fff; }
+.byteflip .to { background: var(--ok-bg); color: var(--ok); }
+.byteflip .to.wait { opacity: 0; }
+.byteflip .from.stay { background: var(--bad-bg); }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes march { to { stroke-dashoffset: -22; } }
+@media (prefers-reduced-motion: reduce) {
+  .shown, .march, .byteflip .to { animation: none; }
+}
 
 @media (max-width: 860px) {
   .top, main { padding-left: 18px; padding-right: 18px; }
