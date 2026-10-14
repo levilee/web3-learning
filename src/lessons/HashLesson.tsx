@@ -3,6 +3,7 @@ import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils.js";
 import { createAccount, explainTamper, flipLastCharacter, sha256Of, signMessage, verifyMessage } from "../crypto";
 import { lessonById } from "../curriculum";
 import { markCheck } from "../store";
+import { AlgorithmAtlas, SignPipeline, Sources } from "../diagrams";
 import { Fields, LessonFrame, Result, downloadText } from "../ui";
 
 type ByteDemo = {
@@ -46,6 +47,8 @@ export function HashLesson() {
         />
       }
     >
+      <AlgorithmAtlas />
+      <Sources which="crypto" />
       <label>
         文字
         <textarea value={message} onChange={(event) => setMessage(event.target.value)} rows={3} />
@@ -98,8 +101,15 @@ export function HashLesson() {
           篡改文字后再验证
         </button>
       </div>
-      {bytes && bytes.beforeHash !== bytes.afterHash ? <Result ok text="哈希变了。改动的是最后一个字节。" /> : null}
-      {signed ? <Result ok text="原始文字的签名验证通过。" /> : null}
+      {signed ? (
+        <SignPipeline
+          message={signed.message}
+          signature={signed.signature}
+          publicKey={signed.publicKey}
+          compareMessage={tamper?.message}
+        />
+      ) : null}
+      {bytes && bytes.beforeHash !== bytes.afterHash ? <Result ok text="哈希变了。改动的是最后一个字节，SHA-256 的 32 字节摘要跟着全变。" /> : null}
       {tamper ? <Result ok={false} testId="verify-reason" text={`验证失败：${tamper.reason}`} /> : null}
       {signed ? (
         <button

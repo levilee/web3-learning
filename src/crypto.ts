@@ -77,6 +77,25 @@ export function signMessage(message: string, secretKeyHex: string): string {
   return bytesToHex(signature);
 }
 
+export function splitCompactSignature(signatureHex: string): { byteLength: number; r: string; s: string } {
+  if (signatureHex.length !== 128) throw new Error(`expected 64-byte compact signature, got ${signatureHex.length / 2} bytes`);
+  return { byteLength: 64, r: signatureHex.slice(0, 64), s: signatureHex.slice(64) };
+}
+
+export function describeSignature(message: string, signatureHex: string, publicKeyHex: string) {
+  const parts = splitCompactSignature(signatureHex);
+  return {
+    messageBytes: utf8ToBytes(message).length,
+    digest: sha256Hex(message),
+    hashAlgorithm: "SHA-256" as const,
+    signatureAlgorithm: "ECDSA" as const,
+    curve: "secp256k1" as const,
+    encoding: "compact r||s" as const,
+    ...parts,
+    ok: verifyMessage(message, signatureHex, publicKeyHex),
+  };
+}
+
 export function verifyMessage(message: string, signatureHex: string, publicKeyHex: string): boolean {
   try {
     return secp256k1.verify(hexToBytes(signatureHex), utf8ToBytes(message), hexToBytes(publicKeyHex));

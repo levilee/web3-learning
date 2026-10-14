@@ -4,6 +4,7 @@ import { lessonById } from "../curriculum";
 import { applyBlock, buildTx, CONTRACT, namedAccounts, type Tx } from "../ledger";
 import { getState, markCheck, saveAccount, saveLedger, useStore } from "../store";
 import { Choice, Fields, LessonFrame, Result, downloadText } from "../ui";
+import { CompileDiagram, Sources } from "../diagrams";
 
 export function ContractLesson() {
   const lesson = lessonById("contract");
@@ -59,7 +60,8 @@ export function ContractLesson() {
         />
       }
     >
-      <p>先做一笔普通转账，再调用合约把 count 写成下一个整数。两边都进同一份模拟账本。</p>
+      <CompileDiagram count={storage} />
+      <p>先做一笔普通转账，再调用合约把 count 写成下一个整数。两边都进同一份模拟账本。图上的 ABI 编码是同一调用在真实链上的 data；按钮写入的仍是可读的 setCount。</p>
       <p className="mono">storage.count = {storage}</p>
       <div className="row">
         <button type="button" onClick={() => submit("transfer")}>
@@ -121,6 +123,7 @@ export function ContractLesson() {
         下载存储快照
       </button>
       {note ? <p>{note}</p> : null}
+      <Sources which="contract" />
     </LessonFrame>
   );
 }

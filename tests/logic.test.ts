@@ -5,6 +5,7 @@ import {
   base58Encode,
   createAccount,
   createDidKey,
+  describeSignature,
   flipLastCharacter,
   issueCredential,
   presentCredential,
@@ -151,14 +152,27 @@ assert.match(
   /状态名单/,
 );
 
+const described = describeSignature(original, signature, account.publicKeyHex);
+assert.equal(described.byteLength, 64);
+assert.equal(described.r.length, 64);
+assert.equal(described.s.length, 64);
+assert.equal(described.digest, sha256Hex(original));
+assert.equal(described.hashAlgorithm, "SHA-256");
+assert.equal(described.signatureAlgorithm, "ECDSA");
+assert.equal(described.curve, "secp256k1");
+assert.equal(described.ok, true);
+
 const material = await issueLabCerts();
 const ok = await verifyLeaf(material.leafPem, material.caPem, []);
 const wrong = await verifyLeaf(material.leafPem, material.otherCaPem, []);
 const revokedCert = await verifyLeaf(material.leafPem, material.caPem, [material.leafSerial]);
 assert.equal(ok.ok, true);
+assert.equal(ok.steps.at(-1)?.ok, true);
 assert.equal(wrong.ok, false);
+assert.equal(wrong.steps[2]?.ok, false);
 assert.match(wrong.reason, /签名验证失败/);
 assert.equal(revokedCert.ok, false);
+assert.match(revokedCert.steps.at(-1)?.body ?? "", /序列号/);
 assert.match(revokedCert.reason, /吊销名单/);
 assert.match(material.leafPem, /BEGIN CERTIFICATE/);
 
