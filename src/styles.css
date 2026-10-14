@@ -1,0 +1,198 @@
+:root {
+  color-scheme: light;
+  --bg: #e6e0d4;
+  --paper: #fbf7f1;
+  --ink: #1b1814;
+  --muted: #645d53;
+  --line: #d5cbbd;
+  --real: #0d6a56;
+  --real-bg: #e4f3ee;
+  --sim: #8a4d09;
+  --sim-bg: #f8ecd8;
+  --ok: #17693a;
+  --ok-bg: #e6f4eb;
+  --bad: #8d2c2c;
+  --bad-bg: #f8e7e4;
+  --shadow: 0 16px 40px rgba(60, 42, 20, 0.08);
+  font-family: "Avenir Next", "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.7), transparent 32%),
+    var(--bg);
+  color: var(--ink);
+}
+
+button, input, textarea, select { font: inherit; color: inherit; }
+
+button, a { cursor: pointer; }
+
+a { color: inherit; }
+
+.app { min-height: 100vh; }
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+  padding: 22px 7vw 10px;
+}
+
+.brand { text-decoration: none; display: flex; flex-direction: column; }
+.brand-kicker { color: var(--muted); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+.brand strong { font-size: 20px; }
+
+nav { display: flex; gap: 8px; }
+
+.nav-link {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  text-decoration: none;
+  background: var(--paper);
+  position: relative;
+}
+
+.nav-link.active { background: var(--ink); color: var(--paper); }
+.nav-link i {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 99px;
+  background: var(--ok);
+  top: 2px;
+  right: 2px;
+}
+
+main { padding: 12px 7vw 64px; }
+
+.home, .lesson { max-width: 1080px; }
+
+.eyebrow, .crumb { color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; font-size: 12px; }
+.crumb { display: flex; gap: 8px; }
+.crumb a { color: var(--real); }
+
+h1 { font-size: clamp(36px, 5vw, 64px); line-height: 0.95; margin: 8px 0 16px; letter-spacing: -0.04em; }
+
+.lede, .model { font-size: 18px; line-height: 1.6; max-width: 68ch; }
+
+.legend, .progress-line, .sim-note, .bridge { color: var(--muted); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 24px 0; }
+
+.badge, .status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.badge.real { background: var(--real-bg); color: var(--real); }
+.badge.sim { background: var(--sim-bg); color: var(--sim); }
+.status.done { background: var(--ok-bg); color: var(--ok); }
+.status.idle { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+
+.path { list-style: none; padding: 0; margin: 20px 0 28px; display: grid; gap: 10px; }
+.path a {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  text-decoration: none;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+.path .num { font-variant-numeric: tabular-nums; font-size: 22px; }
+.path strong, .path em { display: block; }
+.path em { color: var(--muted); font-style: normal; margin-top: 4px; }
+
+.lesson-title { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.lesson-title h1 { flex-basis: 100%; }
+
+.sim-note, .bridge {
+  border-left: 3px solid var(--sim);
+  padding-left: 12px;
+}
+
+.bridge { border-left-color: var(--real); }
+
+.work { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr); gap: 18px; margin-top: 22px; }
+
+.lab, .inspector, .checks {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.inspector h2, .checks h2 { margin: 0 0 12px; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+label { display: grid; gap: 6px; margin: 12px 0; font-size: 14px; color: var(--muted); }
+textarea, input, select {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+
+button {
+  border: 0;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 999px;
+  padding: 10px 14px;
+}
+button:disabled { opacity: 0.45; }
+button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+button.danger { color: var(--bad); }
+
+.mono, .fields dd { font-family: "IBM Plex Mono", "ui-monospace", "SFMono-Regular", Menlo, Consolas, monospace; word-break: break-all; }
+
+.fields { margin: 0; display: grid; gap: 12px; }
+.fields div { display: grid; gap: 4px; }
+.fields dt { color: var(--muted); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+.fields small { display: block; color: var(--muted); margin-top: 4px; }
+
+.result { border-radius: 12px; padding: 10px 12px; }
+.result.ok { background: var(--ok-bg); color: var(--ok); }
+.result.bad { background: var(--bad-bg); color: var(--bad); }
+
+.checks { margin-top: 18px; }
+.checks ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.checks li { padding-left: 22px; position: relative; color: var(--muted); }
+.checks li::before { content: ""; width: 10px; height: 10px; border: 1px solid var(--line); border-radius: 99px; position: absolute; left: 0; top: 5px; }
+.checks li.on { color: var(--ink); }
+.checks li.on::before { background: var(--ok); border-color: var(--ok); }
+
+.choice { border: 0; margin: 16px 0; padding: 0; display: grid; gap: 8px; }
+.choice legend { font-weight: 650; margin-bottom: 4px; }
+.choice label { display: flex; gap: 8px; align-items: center; color: var(--ink); }
+
+.next, .next-done { display: inline-block; margin-top: 16px; }
+.next { color: var(--real); }
+
+.empty, .missing { color: var(--muted); }
+
+@media (max-width: 860px) {
+  .top, main { padding-left: 18px; padding-right: 18px; }
+  .top { align-items: flex-start; flex-direction: column; }
+  .work, .path a { grid-template-columns: 1fr; }
+  .path a { align-items: start; }
+}
